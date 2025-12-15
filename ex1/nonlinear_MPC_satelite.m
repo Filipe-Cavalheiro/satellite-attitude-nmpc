@@ -9,23 +9,22 @@ Nsim = floor(Tf/Ts);
 nx = 12;                    % [R(:); omega]
 nu = 3;                     % torque
 
-N  = 10;                    % NMPC horizon
+N  = 5;                    % NMPC horizon
 
 J = diag([125.734 216.211 234.055]);
-
-% Initial condition
-eul_ref = deg2rad((rand(3,1)-ones(3,1)*0.5)*360);   % desired orientation
-R0 = eul2rotm(eul_ref', 'ZYX');    % MATLAB has some specific functions XD
-w0 = rand(3,1);
-x  = [R0(:); w0];
 
 % Reference (Euler angles -> Rotation matrix)
 eul_ref = deg2rad([30; -70; 132]);   % desired orientation
 Rref = eul2rotm(eul_ref', 'ZYX');    % MATLAB has some specific functions XD
 xref = [Rref(:); zeros(3,1)];
 
+% Initial condition
+R0 = eye(3);
+w0 = [0.5; -0.3; 0.2];
+x  = [R0(:); w0];
+
 % Cost matrices
-Q = diag([50*ones(9,1); 5*ones(3,1)]); % care more about position than velocity
+Q = diag([50*ones(9,1); 5*ones(3,1)]); 
 P = Q;
 R = 0.01*eye(nu);
 
@@ -44,6 +43,7 @@ ulog = zeros(nu,Nsim);
 
 % ================= MAIN SIMULATION LOOP =================
 for k = 1:Nsim
+    disp("current k: " + k);
     xlog(:,k) = x;
 
     % Solve NMPC
@@ -79,9 +79,8 @@ for i = 1:1:k
     drawnow;
 end
 
-% ================= FUNCTIONS =================
+%% ================= FUNCTIONS =================
 function u = attController(x0, xref, N, nx, nu, Ts, Qbar, Rbar, opts, J)
-
     % Decision variables: [X; U]
     XU0 = zeros((N+1)*nx + N*nu,1);
 
