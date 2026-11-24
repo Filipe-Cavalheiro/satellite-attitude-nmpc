@@ -416,3 +416,12 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# MATLAB autosaves
+*.asv
+
+# LaTeX build files
+Report/*
+!Report/main.tex
+!Report/main.pdf
+!Report/Imagens/
